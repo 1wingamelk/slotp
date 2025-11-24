@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slot Bonus Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0f2e 100%);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Звездное небо */
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Контейнер */
+        .container {
+            position: relative;
+            z-index: 10;
+            background: rgba(15, 15, 46, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        /* Glow эффект на контейнере */
+        .container {
+            box-shadow: 
+                0 0 20px rgba(100, 200, 255, 0.3),
+                0 0 40px rgba(100, 150, 255, 0.2),
+                inset 0 0 20px rgba(100, 200, 255, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #64c8ff;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-shadow: 0 0 10px rgba(100, 200, 255, 0.5);
+            letter-spacing: 2px;
+        }
+
+        /* Селект слотов */
+        .select-container {
+            margin-bottom: 30px;
+        }
+
+        .select-label {
+            display: block;
+            color: #64c8ff;
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(100, 200, 255, 0.3);
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            background: rgba(30, 50, 100, 0.5);
+            border: 2px solid rgba(100, 200, 255, 0.3);
+            color: #64c8ff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(100, 200, 255, 0.2);
+        }
+
+        select:hover {
+            border-color: rgba(100, 200, 255, 0.6);
+            box-shadow: 0 0 25px rgba(100, 200, 255, 0.4);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #64c8ff;
+            box-shadow: 0 0 30px rgba(100, 200, 255, 0.6);
+        }
+
+        select option {
+            background: #0a0e27;
+            color: #64c8ff;
+        }
+
+        /* Кнопка START */
+        .start-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        .start-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.8);
+        }
+
+        .start-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .start-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Результат */
+        .result-container {
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .result-text {
+            color: #64c8ff;
+            font-size: 36px;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(100, 200, 255, 0.6);
+            animation: pulse 0.5s ease-out;
+            margin-bottom: 10px;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .slot-name {
+            color: #ffd700;
+            font-size: 14px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+            margin-top: 10px;
+        }
+
+        /* Таймер */
+        .timer {
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-top: 10px;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.4);
+        }
+
+        /* Предупреждение внизу */
+        .warning {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            color: #ff9999;
+            font-size: 12px;
+            text-align: center;
+            line-height: 1.6;
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.2);
+            text-shadow: 0 0 5px rgba(255, 107, 107, 0.3);
+        }
+
+        .warning-title {
+            font-weight: bold;
+            color: #ff6b6b;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .result-text {
+                font-size: 28px;
+            }
+
+            .start-btn {
+                padding: 12px;
+                font-size: 16px;
+            }
+        }
+
+        /* Дополнительные звездочки */
+        .glow-star {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #64c8ff;
+            border-radius: 50%;
+            animation: glow-pulse 2s infinite;
+            box-shadow: 0 0 10px rgba(100, 200, 255, 0.6);
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.5);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Звездное небо -->
+    <div class="stars" id="starfield"></div>
+
+    <!-- Основной контейнер -->
+    <div class="container">
+        <h1>✨ SLOT BONUS ✨</h1>
+
+        <!-- Выбор слота -->
+        <div class="select-container">
+            <label class="select-label">Выберите слот:</label>
+            <select id="slotSelect">
+                <option value="">-- Выберите игру --</option>
+                <option value="Gates of Olympus">Gates of Olympus</option>
+                <option value="Gates of Olympus 1000">Gates of Olympus 1000</option>
+                <option value="Sugar Rush 1000">Sugar Rush 1000</option>
+                <option value="Big Bass Bonanza">Big Bass Bonanza</option>
+                <option value="Sweet Bonanza">Sweet Bonanza</option>
+                <option value="Sweet Bonanza 1000">Sweet Bonanza 1000</option>
+                <option value="Fruit Party">Fruit Party</option>
+                <option value="Sky Bounty">Sky Bounty</option>
+                <option value="Hot Fiesta">Hot Fiesta</option>
+            </select>
+        </div>
+
+        <!-- Кнопка START -->
+        <button class="start-btn" id="startBtn">START</button>
+
+        <!-- Результат -->
+        <div class="result-container" id="resultContainer" style="display: none;">
+            <div class="result-text" id="resultText"></div>
+            <div class="slot-name" id="slotName"></div>
+            <div class="timer" id="timer"></div>
+        </div>
+
+        <!-- Предупреждение -->
+        <div class="warning">
+            <div class="warning-title">⚠️ ВНИМАНИЕ!</div>
+            ПОСЛЕ НАЖАТИЯ START ПОКУПАЙТЕ СРАЗУ БОНУСКИ<br>
+            ТАК КАК КЛЮЧ ГЕНЕРАЦИИ МЕНЯЕТСЯ МОМЕНТАЛЬНО
+        </div>
+    </div>
+
+    <script>
+        // Создание звездного неба
+        function createStars() {
+            const starfield = document.getElementById('starfield');
+            const starCount = 100;
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starfield.appendChild(star);
+            }
+
+            // Добавляем светящиеся звезды
+            for (let i = 0; i < 20; i++) {
+                const glowStar = document.createElement('div');
+                glowStar.className = 'glow-star';
+                glowStar.style.left = Math.random() * 100 + '%';
+                glowStar.style.top = Math.random() * 100 + '%';
+                glowStar.style.animationDelay = Math.random() * 2 + 's';
+                starfield.appendChild(glowStar);
+            }
+        }
+
+        // Генератор случайного числа
+        function generateBonusCount() {
+            return Math.floor(Math.random() * 3) + 2; // 2-4
+        }
+
+        // Обработка клика
+        document.getElementById('startBtn').addEventListener('click', function() {
+            const slotSelect = document.getElementById('slotSelect');
+            const selectedSlot = slotSelect.value;
+
+            if (!selectedSlot) {
+                alert('Пожалуйста, выберите слот!');
+                return;
+            }
+
+            const btn = this;
+            btn.disabled = true;
+
+            const resultContainer = document.getElementById('resultContainer');
+            const resultText = document.getElementById('resultText');
+            const slotName = document.getElementById('slotName');
+            const timer = document.getElementById('timer');
+
+            // Генерируем число бонусок
+            const bonusCount = generateBonusCount();
+            resultText.textContent = `Купите ${bonusCount} бонуски`;
+            slotName.textContent = `Слот: ${selectedSlot}`;
+
+            // Показываем результат
+            resultContainer.style.display = 'flex';
+
+            // Таймер обратного отсчета
+            let timeLeft = 15;
+            timer.textContent = `Обновление через: ${timeLeft}с`;
+
+            const countdownInterval = setInterval(() => {
+                timeLeft--;
+                timer.textContent = `Обновление через: ${timeLeft}с`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    
+                    // Скрываем результат
+                    resultContainer.style.display = 'none';
+                    
+                    // Разблокируем кнопку
+                    btn.disabled = false;
+                    
+                    // Сбрасываем селект
+                    slotSelect.value = '';
+                }
+            }, 1000);
+        });
+
+        // Инициализация
+        createStars();
+    </script>
+</body>
+</html>
